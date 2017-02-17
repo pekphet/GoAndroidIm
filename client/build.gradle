@@ -1,0 +1,29 @@
+//configurations.maybeCreate("default")
+//artifacts.add("default", file('goandroid.aar'))
+
+plugins {
+    id "org.golang.mobile.bind" version "0.2.6"
+}
+
+gobind {
+    // Package to bind. Separate multiple packages with spaces.
+    pkg="chathome/client"
+
+    // GOPATH
+    GOPATH="/home/fish/GoProject"
+
+    // Optional list of architectures. Defaults to all supported architectures.
+    GOARCH="arm amd64"
+
+    // Absolute path to the gomobile binary. Optional.
+    GOMOBILE="/home/fish/GoBin/gomobile"
+
+    // Absolute path to the gobind binary. Optional.
+//    GOBIND="/mypath/bin/gobind"
+
+    // Absolute path to the go binary. Optional.
+    GO="/usr/local/go/bin/go"
+
+    // Pass extra parameters to command line. Optional.
+//    GOMOBILEFLAGS="-javapkg my.java.package"
+}

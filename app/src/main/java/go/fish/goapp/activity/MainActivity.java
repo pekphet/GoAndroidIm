@@ -19,11 +19,13 @@ import android.widget.TextView;
 
 import go.fish.goapp.R;
 import go.fish.goapp.entity.CommandData;
+import go.fish.goapp.interfaces.TCPCallback;
 import go.fish.goapp.service.SocketService;
 import go.fish.goapp.utils.Chatter;
+import go.fish.goapp.utils.EventHelper;
 import go.fish.goapp.utils.IEventReceiver;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TCPCallback {
 
 
     private LinearLayout mLlContent;
@@ -83,22 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initEventReceiver() {
-        mReceiver = new IEventReceiver<CommandData>() {
-            @Override
-            public void onReceived(CommandData data) {
-                switch (data.getAct()) {
-                    case Chat:
-                        addTextView(data.getArg());
-                        break;
-                    case Users:
-                        r_users = data.getArg().split(",");
-                        flushSpinner(r_users);
-                        break;
-                }
-            }
-            @Override
-            public void onReceivedError(String msg) {}
-        };
+        mReceiver = EventHelper.createEventReceiver(this);
         SocketService.gPoster.clean();
         SocketService.gPoster.registered(mReceiver);
     }
@@ -185,6 +172,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        SocketService.gPoster.unregistered(mReceiver);
+    }
+
+    @Override
+    public void doCmd(CommandData cmdData) {
+        switch (cmdData.getAct()) {
+
+        }
     }
 }

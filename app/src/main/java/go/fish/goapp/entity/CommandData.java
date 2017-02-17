@@ -1,35 +1,30 @@
 package go.fish.goapp.entity;
 
+import static go.fish.goapp.Constants.P_SP;
+
 /**
  * Created by fish on 17-2-14.
  */
 
 public class CommandData {
-    private CommandAction act;
+    private String act;
     private String arg;
 
-    public CommandData() {
+    public CommandData(String rcv) {
+        this.act = rcv.split(P_SP)[0];
+        this.arg = rcv.split(P_SP)[1];
     }
 
-    public CommandData(String cmd) {
-        this.arg = cmd.split("<-")[1];
-        switch (cmd.split("<-")[0]) {
-            case "user_list" :
-                this.act = CommandAction.Users;
-                return;
-        }
-    }
-
-    public CommandData(CommandAction act, String arg) {
+    public CommandData(String act, String arg) {
         this.act = act;
         this.arg = arg;
     }
 
-    public CommandAction getAct() {
+    public String getAct() {
         return act;
     }
 
-    public void setAct(CommandAction act) {
+    public void setAct(String act) {
         this.act = act;
     }
 
