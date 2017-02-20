@@ -17,30 +17,44 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import go.fish.goapp.App;
 import go.fish.goapp.R;
+import go.fish.goapp.command.ChatCommands;
 import go.fish.goapp.entity.CommandData;
 import go.fish.goapp.interfaces.TCPCallback;
 import go.fish.goapp.service.SocketService;
-import go.fish.goapp.utils.Chatter;
 import go.fish.goapp.utils.EventHelper;
 import go.fish.goapp.utils.IEventReceiver;
+
+import static go.fish.goapp.Constants.MSG_BROADCAST_FLAG;
+import static go.fish.goapp.Constants.MSG_NORMAL_FLAG;
+import static go.fish.goapp.Constants.MSG_PRIV_FLAG;
+import static go.fish.goapp.Constants.P_RS_USER_LIST;
+import static go.fish.goapp.Constants.P_SEND_MSG;
+import static go.fish.goapp.Constants.P_SP_ARG;
+import static go.fish.goapp.Constants.P_SP_SEND;
 
 public class MainActivity extends AppCompatActivity implements TCPCallback {
 
 
-    private LinearLayout mLlContent;
     private ArrayAdapter<String> mSpiAdapter;
+    private LinearLayout mLlContent;
     private EditText mEtSend;
     private Button mBtnSend;
     private ScrollView mScroll;
     private Button mBtnRefresh;
     private Spinner mSpiUsers;
-    private String[] r_users;
-    private String mName = "";
-    private boolean isConn = false;
+
     private Handler mHandler = new Handler(Looper.myLooper());
-    private boolean isAdapterFirst = true;
     private IEventReceiver<CommandData> mReceiver;
+
+    private boolean isAdapterFirst = true;
+    private boolean isPriv = false;
+    private int targetPriv = -1;
+    private String[] r_users;
     private LinearLayout.LayoutParams mTvLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 
@@ -68,20 +82,16 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
         mSpiUsers = (Spinner) findViewById(R.id.spi_users);
 
         mBtnSend.setOnClickListener(v -> {
-            Chatter.send(mEtSend.getText().toString());
+            if (isPriv) {
+                ChatCommands.sendMsgTo(targetPriv, (mEtSend.getText().toString()));
+            } else {
+                ChatCommands.sendMsg(mEtSend.getText().toString());
+            }
             addTextViewR(mEtSend.getText().toString());
             mEtSend.setText("");
         });
 
-        mBtnSend.setOnLongClickListener(v -> {
-            String tmp = mEtSend.getText().toString();
-            mName = tmp;
-            Chatter.ChangeName(tmp);
-            mEtSend.setText("");
-            return false;
-        });
-
-        mBtnRefresh.setOnClickListener(v -> Chatter.freshUserList());
+        mBtnRefresh.setOnClickListener(v -> ChatCommands.listUsers());
     }
 
     private void initEventReceiver() {
@@ -91,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
     }
 
     private void initAdapter() {
-
         mSpiAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         mSpiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpiUsers.setAdapter(mSpiAdapter);
@@ -105,12 +114,12 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
                 if (r_users == null || r_users.length < 1) {
                     return;
                 }
-                if (r_users[position].equals("ALL")) {
-                    Chatter.ClearChatUser();
-                } else if (r_users[position].equals(mName) || r_users[position].equals("")) {
-                    return;
+                if(r_users[position].split(":")[1].equals("-1")) {
+                    isPriv = false;
+                    targetPriv = -1;
                 } else {
-                    Chatter.ChangeUser(r_users[position]);
+                    isPriv = true;
+                    targetPriv = Integer.parseInt(r_users[position].split(":")[1]);
                 }
             }
 
@@ -120,15 +129,18 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
         });
     }
 
-    private void addTextView(String msg) {
+    private void addTextView(String msg, int flag) {
+        if (msg.split(":")[0].equals(App.sName)) {
+            return;
+        }
         TextView tv = new TextView(this);
         tv.setLayoutParams(mTvLayoutParams);
         tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
         tv.setPadding(0, 5, 0, 5);
         tv.setText(msg);
-        if (msg.contains("(priv)")) {
+        if (flag == MSG_PRIV_FLAG) {
             tv.setTextColor(0xFF77bbff);
-        } else if (msg.startsWith("通知")) {
+        } else if (flag == MSG_BROADCAST_FLAG) {
             tv.setTextColor(0xffee22ee);
         }
         mLlContent.addView(tv);
@@ -140,21 +152,19 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
         tv.setLayoutParams(mTvLayoutParams);
         tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
         tv.setPadding(0, 5, 0, 5);
-        tv.setText(mName + ":" + msg);
+        tv.setText(App.sName + ":" + msg);
         mLlContent.addView(tv);
-        DoDelayed(new Runnable() {
-                      @Override
-                      public void run() {
-                          mScroll.fullScroll(ScrollView.FOCUS_DOWN);
-                      }
-                  }
-        );
-
+        DoDelayed(()->mScroll.fullScroll(ScrollView.FOCUS_DOWN));
     }
 
     private void flushSpinner(String[] strs) {
+        r_users = strs;
+        List<String> tmp = new ArrayList<>();
+        for(String s : strs) {
+            tmp.add(s.split(":")[0]);
+        }
         mSpiAdapter.clear();
-        mSpiAdapter.addAll(strs);
+        mSpiAdapter.addAll(tmp);
     }
 
 
@@ -177,6 +187,21 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
     @Override
     public void doCmd(CommandData cmdData) {
         switch (cmdData.getAct()) {
+            case P_SEND_MSG :
+                addTextView(cmdData.getArg(), MSG_NORMAL_FLAG);
+                break;
+            case P_SEND_MSG + P_SP_SEND:
+                addTextView(cmdData.getArg(), MSG_PRIV_FLAG);
+                break;
+            case P_RS_USER_LIST:
+                flushSpinner(cmdData.getArg().split(P_SP_ARG));
+                break;
+        }
+    }
+
+    @Override
+    public void doErr(String errCode) {
+        switch (errCode) {
 
         }
     }

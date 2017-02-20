@@ -51,6 +51,8 @@ public class SocketService extends Service implements Constants {
                 innerMsg = Client.receive();
                 if (innerMsg.contains(P_SP)) {
                     gHandler.post(() -> gPoster.post(new CommandData(innerMsg)));
+                } else if (innerMsg.contains(P_RS_ERR)) {
+                    gHandler.post(() -> gPoster.postError(innerMsg));
                 }
             }
         });

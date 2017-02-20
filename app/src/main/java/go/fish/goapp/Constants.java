@@ -41,4 +41,11 @@ public interface Constants {
     String E_CODE_PWD	    = "102";		//PWD IS WRONG
 
 
+    /**
+     * UI FLAGS
+     */
+    int MSG_NORMAL_FLAG     = 0;
+    int MSG_PRIV_FLAG       = 2;
+    int MSG_BROADCAST_FLAG  = 4;
+
 }

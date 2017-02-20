@@ -8,4 +8,5 @@ import go.fish.goapp.entity.CommandData;
 
 public interface TCPCallback {
     void doCmd(CommandData cmdData);
+    void doErr(String errCode);
 }

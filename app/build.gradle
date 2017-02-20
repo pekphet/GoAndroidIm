@@ -7,8 +7,8 @@ android {
         applicationId "go.fish.goapp"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 320
-        versionName "0.32"
+        versionCode 500
+        versionName "0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         jackOptions {

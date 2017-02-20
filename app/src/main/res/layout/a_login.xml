@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="22dp"
+        android:text="AndroidGo-ChatRoom"
+        android:gravity="center"/>
+
+    <EditText
+        android:id="@+id/et_acc"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:textSize="15dp"
+        android:singleLine="true"
+        android:hint="Input Ur Account"/>
+
+    <EditText
+        android:id="@+id/et_pwd"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:inputType="textPassword"
+        android:textSize="15dp"
+        android:singleLine="true"
+        android:hint="Input Ur Password"/>
+
+    <EditText
+        android:id="@+id/et_nick"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="15dp"
+        android:visibility="gone"
+        android:singleLine="true"
+        android:hint="Input Ur Nickname"/>
+
+    <Button
+        android:id="@+id/btn_cmt"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Login"/>
+
+    <Button
+        android:id="@+id/btn_chg_reg"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:textSize="14dp"
+        android:text="To Register"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="40dp"/>
+
+
+</LinearLayout>

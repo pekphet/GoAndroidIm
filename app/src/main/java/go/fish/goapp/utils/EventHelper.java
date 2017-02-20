@@ -15,7 +15,9 @@ public class EventHelper {
                 callback.doCmd(cmdData);
             }
             @Override
-            public void onReceivedError(String msg) {}
+            public void onReceivedError(String msg) {
+                callback.doErr(msg.split(":")[1]);
+            }
         };
         return eRcv;
     }
