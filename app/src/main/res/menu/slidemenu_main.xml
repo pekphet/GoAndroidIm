@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:checkable="true"
+            android:id="@+id/sm_main_status"
+            android:title="人物状态"/>
+        <item
+            android:checkable="true"
+            android:id="@+id/sm_main_bag"
+            android:title="背包"/>
+
+        <item
+            android:checkable="true"
+            android:id="@+id/sm_main_quest"
+            android:title="任务"/>
+
+        <item
+            android:checkable="true"
+            android:id="@+id/sm_main_fix"
+            android:title="合成"/>
+
+        <item
+            android:checkable="true"
+            android:id="@+id/sm_main_gift"
+            android:title="抽奖"/>
+    </group>
+</menu>

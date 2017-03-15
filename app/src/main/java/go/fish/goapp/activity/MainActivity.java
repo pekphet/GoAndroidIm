@@ -56,32 +56,30 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
     private int targetPriv = -1;
     private String[] r_users;
     private LinearLayout.LayoutParams mTvLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    private LinearLayout mLlUserList;
+    private View mVGround;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        startSocketServer();
+        setContentView(R.layout.a_main_all);
         initView();
         initEventReceiver();
         initAdapter();
     }
 
-    private void startSocketServer() {
-        Intent intent = new Intent(this, SocketService.class);
-        startService(intent);
-    }
-
     private void initView() {
-        mScroll = (ScrollView) findViewById(R.id.scroll);
-        mLlContent = (LinearLayout) findViewById(R.id.ll_content);
-        mEtSend = (EditText) findViewById(R.id.et_send);
-        mBtnSend = (Button) findViewById(R.id.btn_send);
+        mScroll     = (ScrollView) findViewById(R.id.scroll);
+        mLlContent  = (LinearLayout) findViewById(R.id.ll_content);
+        mEtSend     = (EditText) findViewById(R.id.et_send);
+        mBtnSend    = (Button) findViewById(R.id.btn_send);
         mBtnRefresh = (Button) findViewById(R.id.btn_fresh_spi);
-        mSpiUsers = (Spinner) findViewById(R.id.spi_users);
-
+        mSpiUsers   = (Spinner) findViewById(R.id.spi_users);
+        mLlUserList = (LinearLayout) findViewById(R.id.ll_userlist);
+        mVGround    = findViewById(R.id.v_main_ground);
         mBtnSend.setOnClickListener(v -> {
+//            ImmUtils.hideImm(this);
             if (isPriv) {
                 ChatCommands.sendMsgTo(targetPriv, (mEtSend.getText().toString()));
             } else {
@@ -90,8 +88,11 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
             addTextViewR(mEtSend.getText().toString());
             mEtSend.setText("");
         });
-
+        mLlUserList.setVisibility(View.GONE);
         mBtnRefresh.setOnClickListener(v -> ChatCommands.listUsers());
+        mEtSend.setOnClickListener(v -> mHandler.postDelayed(() -> mScroll.fullScroll(ScrollView.FOCUS_DOWN), 200));
+        findViewById(R.id.btn_main_add_eqp).setOnClickListener(v-> startActivity(new Intent(this, AddEquipmentsActivity.class)));
+        findViewById(R.id.btn_main_add_item).setOnClickListener(v-> startActivity(new Intent(this, AddItemsActivity.class)));
     }
 
     private void initEventReceiver() {
@@ -122,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
                     targetPriv = Integer.parseInt(r_users[position].split(":")[1]);
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements TCPCallback {
             tv.setTextColor(0xffee22ee);
         }
         mLlContent.addView(tv);
-        mScroll.fullScroll(ScrollView.FOCUS_DOWN);
+        mHandler.postDelayed(()->mScroll.fullScroll(ScrollView.FOCUS_DOWN), 100);
     }
 
     private void addTextViewR(String msg) {
